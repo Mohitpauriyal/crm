@@ -81,15 +81,15 @@ Follow Up:
     print("STEP 2")
 
     interaction = Interaction(
-        doctor_name=request.doctor_name,
-        hospital=request.hospital,
-        specialty=request.specialty,
-        interaction_type=request.interaction_type,
-        interaction_date=date.fromisoformat(request.interaction_date),
-        notes=request.notes,
-        summary=summary,
-        follow_up_date=date.fromisoformat(request.follow_up_date),
-    )
+    doctor_name=request.doctor_name,
+    hospital=request.hospital,
+    specialty=request.specialty,
+    interaction_type=request.interaction_type,
+    interaction_date=request.interaction_date,
+    notes=request.notes,
+    summary=summary,
+    follow_up_date=request.follow_up_date,
+)
 
     print("STEP 3")
 
