@@ -1,69 +1,56 @@
 from .llm import llm
-from app.models import Interaction
 
 
+# -----------------------------------------
+# Tool 1 : Log Interaction
+# -----------------------------------------
 def log_interaction(notes: str):
-    print("========== PROMPT ==========")
-    print(notes)
+    try:
+        print("========== PROMPT ==========")
+        print(notes)
 
-    prompt = f"""
-    Summarize this doctor's interaction.
+        prompt = f"""
+Summarize this doctor's interaction.
 
-    Interaction:
-    {notes}
+Interaction:
+{notes}
 
-    Return:
-    - Summary
-    - Key Points
-    - Follow Up
-    """
+Return:
+- Summary
+- Key Points
+- Follow Up
+"""
 
-    response = llm.invoke(prompt)
+        print("Before invoke")
 
-    print("========== AI RESPONSE ==========")
-    print(response.content)
+        response = llm.invoke(prompt)
 
-    return response.content
+        print("After invoke")
+        print("Type:", type(response))
+        print("Content:", response.content)
+
+        return response.content
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise
 
 
+# -----------------------------------------
+# Tool 2 : Edit Interaction
+# -----------------------------------------
 def edit_interaction(old_text: str, instruction: str):
+
     prompt = f"""
-    Existing Interaction:
-    {old_text}
+Existing Interaction:
+{old_text}
 
-    Edit Instruction:
-    {instruction}
+Edit Instruction:
+{instruction}
 
-    Return updated interaction.
-    """
-
-    response = llm.invoke(prompt)
-
-    return response.content
-
-
-def search_interaction(query: str):
-    return f"Searching interactions for: {query}"
-
-
-def followup_recommendation(summary: str):
-    prompt = f"""
-    Based on this interaction suggest next follow-up.
-
-    {summary}
-    """
-
-    response = llm.invoke(prompt)
-
-    return response.content
-
-
-def interaction_insights(data: str):
-    prompt = f"""
-    Analyze the following interaction and provide insights.
-
-    {data}
-    """
+Return updated interaction.
+"""
 
     response = llm.invoke(prompt)
 
@@ -71,7 +58,46 @@ def interaction_insights(data: str):
 
 
 # -----------------------------------------
-# AI Chat with Database
+# Tool 3 : Search Interaction
+# -----------------------------------------
+def search_interaction(query: str):
+    return f"Searching interactions for: {query}"
+
+
+# -----------------------------------------
+# Tool 4 : Follow-up Recommendation
+# -----------------------------------------
+def followup_recommendation(summary: str):
+
+    prompt = f"""
+Based on this interaction suggest next follow-up.
+
+{summary}
+"""
+
+    response = llm.invoke(prompt)
+
+    return response.content
+
+
+# -----------------------------------------
+# Tool 5 : Interaction Insights
+# -----------------------------------------
+def interaction_insights(data: str):
+
+    prompt = f"""
+Analyze the following interaction and provide insights.
+
+{data}
+"""
+
+    response = llm.invoke(prompt)
+
+    return response.content
+
+
+# -----------------------------------------
+# Tool 6 : AI Chat with Database
 # -----------------------------------------
 def chat_with_ai(question: str, interactions):
 

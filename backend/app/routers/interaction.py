@@ -43,9 +43,9 @@ class InteractionRequest(BaseModel):
     hospital: str
     specialty: str
     interaction_type: str
-    interaction_date: str
+    interaction_date: date
     notes: str
-    follow_up_date: str
+    follow_up_date: date
     
     
 class UpdateRequest(BaseModel):
@@ -53,9 +53,9 @@ class UpdateRequest(BaseModel):
     hospital: str
     specialty: str
     interaction_type: str
-    interaction_date: str
+    interaction_date: date
     notes: str
-    follow_up_date: str
+    follow_up_date: date
 
 @router.post("/log")
 def log_interaction_api(
@@ -202,7 +202,7 @@ Follow Up:
 {request.follow_up_date}
 """
 
-    summary = log_interaction(full_notes)
+    summary = "Test Summary"
 
     interaction.doctor_name = request.doctor_name
     interaction.hospital = request.hospital
