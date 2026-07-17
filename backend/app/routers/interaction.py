@@ -62,23 +62,7 @@ def log_interaction_api(
     request: InteractionRequest,
     db: Session = Depends(get_db)
 ):
-    full_notes = f"""
-Doctor: {request.doctor_name}
-Hospital: {request.hospital}
-Specialty: {request.specialty}
-Interaction Type: {request.interaction_type}
-Interaction Date: {request.interaction_date}
-
-Notes:
-{request.notes}
-
-Follow Up:
-{request.follow_up_date}
-"""
-
-    print("STEP 1")
-    summary = log_interaction(full_notes)
-    print("STEP 2")
+    summary = "Test Summary"
 
     interaction = Interaction(
         doctor_name=request.doctor_name,
@@ -91,23 +75,15 @@ Follow Up:
         follow_up_date=date.fromisoformat(request.follow_up_date),
     )
 
-    print("STEP 3")
-
     db.add(interaction)
-    print("STEP 4")
-
     db.commit()
-    print("STEP 5")
-
     db.refresh(interaction)
-    print("STEP 6")
 
     return {
         "success": True,
         "summary": summary,
         "id": interaction.id
     }
-    
     
 @router.post("/search")
 def search_api(
