@@ -11,10 +11,11 @@ app = FastAPI(title="AI CRM HCP API")
 # CORS
 app.add_middleware(
     CORSMiddleware,
-   allow_origins=[
-    "http://localhost:5173",  # Vite Dev
-    "http://localhost:3000",  # Docker Frontend
-  ],  # React frontend
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:3000",
+        "https://crm-pauriyal.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
