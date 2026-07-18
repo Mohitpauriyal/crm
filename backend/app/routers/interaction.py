@@ -7,6 +7,7 @@ from app.models import Interaction
 from sqlalchemy import or_
 from sqlalchemy import func
 from app.ai.tools import chat_with_ai
+from app.ai.tools import log_interaction
 #-----for excel file
 from fastapi.responses import FileResponse
 from reportlab.platypus import SimpleDocTemplate, Paragraph
@@ -202,16 +203,16 @@ Follow Up:
 {request.follow_up_date}
 """
 
-    summary = "Test Summary"
+    summary = log_interaction(full_notes)
 
     interaction.doctor_name = request.doctor_name
     interaction.hospital = request.hospital
     interaction.specialty = request.specialty
     interaction.interaction_type = request.interaction_type
-    interaction.interaction_date = date.fromisoformat(request.interaction_date)
+    interaction.interaction_date = request.interaction_date
     interaction.notes = request.notes
     interaction.summary = summary
-    interaction.follow_up_date = date.fromisoformat(request.follow_up_date)
+    interaction.follow_up_date = request.follow_up_date
 
     db.commit()
     db.refresh(interaction)
