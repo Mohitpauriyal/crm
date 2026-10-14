@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from datetime import date
@@ -8,6 +8,8 @@ from sqlalchemy import or_
 from sqlalchemy import func
 from app.ai.tools import chat_with_ai
 from app.ai.tools import log_interaction
+
+from fastapi import HTTPException
 #-----for excel file
 from fastapi.responses import FileResponse
 from reportlab.platypus import SimpleDocTemplate, Paragraph
@@ -58,57 +60,57 @@ class UpdateRequest(BaseModel):
     notes: str
     follow_up_date: date
 
+
 @router.post("/log")
 def log_interaction_api(
     request: InteractionRequest,
     db: Session = Depends(get_db)
 ):
-    full_notes = f"""
+    try:
+        full_notes = f"""
 Doctor: {request.doctor_name}
 Hospital: {request.hospital}
 Specialty: {request.specialty}
 Interaction Type: {request.interaction_type}
 Interaction Date: {request.interaction_date}
-
-Notes:
-{request.notes}
-
-Follow Up:
-{request.follow_up_date}
+Notes: {request.notes}
+Follow Up: {request.follow_up_date}
 """
 
-    print("STEP 1")
-    summary = log_interaction(full_notes)
-    print("STEP 2")
+        # Generate summary
+        summary = log_interaction(full_notes)
 
-    interaction = Interaction(
-    doctor_name=request.doctor_name,
-    hospital=request.hospital,
-    specialty=request.specialty,
-    interaction_type=request.interaction_type,
-    interaction_date=request.interaction_date,
-    notes=request.notes,
-    summary=summary,
-    follow_up_date=request.follow_up_date,
-)
+        # Save to database
+        interaction = Interaction(
+            doctor_name=request.doctor_name,
+            hospital=request.hospital,
+            specialty=request.specialty,
+            interaction_type=request.interaction_type,
+            interaction_date=request.interaction_date,
+            notes=request.notes,
+            summary=summary,
+            follow_up_date=request.follow_up_date
+        )
 
-    print("STEP 3")
+        db.add(interaction)
+        db.commit()
+        db.refresh(interaction)
 
-    db.add(interaction)
-    print("STEP 4")
+        return {
+            "success": True,
+            "message": "Interaction added successfully",
+            "summary": summary,
+            "id": interaction.id
+        }
 
-    db.commit()
-    print("STEP 5")
+    except Exception as e:
+        db.rollback()
+        print("ERROR WHILE ADDING INTERACTION:", repr(e))
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
-    db.refresh(interaction)
-    print("STEP 6")
-
-    return {
-        "success": True,
-        "summary": summary,
-        "id": interaction.id
-    }
-    
     
 @router.post("/search")
 def search_api(
@@ -279,23 +281,6 @@ def analytics(db: Session = Depends(get_db)):
         "visits": total_visits,
         "calls": total_calls,
         "emails": total_emails,
-    }
-
-@router.post("/chat")
-def chat_api(
-    request: ChatRequest,
-    db: Session = Depends(get_db)
-):
-
-    interactions = db.query(Interaction).all()
-
-    answer = chat_with_ai(
-        request.question,
-        interactions
-    )
-
-    return {
-        "answer": answer
     }
 
 # -----------------------------
